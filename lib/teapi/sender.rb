@@ -16,6 +16,10 @@ module Teapi
       request(:post, resource, {body: data})
     end
 
+    def delete(resource, data)
+      request(:delete, resource, {body: data})
+    end
+
     private
     def request(method, resource, args = {})
       url = "#{BASE_URL}#{resource}?ts=#{Time.now.to_i}"

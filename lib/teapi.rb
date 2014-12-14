@@ -30,5 +30,12 @@ module Teapi #:nodoc
     def post(resource, data)
       sender.post(resource, data)
     end
+
+    # Issues a DELETE request to the teapi.io service
+    # @param [Symbol] resource name of the resource (:tags, :likes, ...)
+    # @param [Hash] data data to send to the service
+    def delete(resource, data)
+      sender.delete(resource, data)
+    end
   end
 end

@@ -34,4 +34,5 @@ Documents can be created, updated or deleted one at a time:
 ```ruby
 Teapi::Documents.create('people', {id: 4, name: 'leto atreides', power: 9001})
 Teapi::Documents.update('people', {id: 4, name: 'leto atreides', power: 9002})
+Teapi::Documents.delete('people', 4)
 ```

@@ -24,4 +24,15 @@ describe 'documents' do
     configuration = setup_configuration(sync_key: 'over9000!', sync_secret: 'dune', host: 'fake.teapi.io')
     expect(Teapi::Documents.update('atreides', {name: 'jessica'}).code).to eq(201)
   end
+
+  it "deletes a single document" do
+    expect(HTTParty).to receive(:delete) do |url, args|
+      expect(url).to eq('https://fake.teapi.io/v1/documents?ts=1424959555')
+      assert_auth(args, 'over9000!', 'f5cf7c3c2fe6084a24151a5d3973d0f1837530098603f826da9aaa578985ec75')
+      assert_body(args, {type: 'atreides', id: 545})
+      FakeResponse.new('', 204)
+    end
+    configuration = setup_configuration(sync_key: 'over9000!', sync_secret: 'dune', host: 'fake.teapi.io')
+    expect(Teapi::Documents.delete('atreides', 545).code).to eq(204)
+  end
 end
