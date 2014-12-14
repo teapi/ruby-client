@@ -12,7 +12,7 @@ module Teapi
     # @param type [String] the document's type
     # @param doc [Hash] the document to update
     def self.update(type, doc)
-      Teapi.post(:documents, Oj.dump({type: type, doc: doc}, mode: :compat))
+      Teapi.put(:documents, Oj.dump({type: type, doc: doc}, mode: :compat))
     end
 
     # deletes the document, by its id, belonging to the given type

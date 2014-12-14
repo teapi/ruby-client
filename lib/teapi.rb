@@ -25,17 +25,24 @@ module Teapi #:nodoc
     end
 
     # Issues a POST request to the teapi.io service
-    # @param [Symbol] resource name of the resource (:tags, :likes, ...)
-    # @param [Hash] data data to send to the service
-    def post(resource, data)
-      sender.post(resource, data)
+    # @param resource [Symbol] name of resource
+    # @param body [Hash] to send to the service
+    def post(resource, body)
+      sender.request(:post, resource, {body: body})
+    end
+
+    # Issues a PUT request to the teapi.io service
+    # @param resource [Symbol] name of resource
+    # @param body [Hash] to send to the service
+    def put(resource, body)
+      sender.request(:put, resource, {body: body})
     end
 
     # Issues a DELETE request to the teapi.io service
-    # @param [Symbol] resource name of the resource (:tags, :likes, ...)
-    # @param [Hash] data data to send to the service
-    def delete(resource, data)
-      sender.delete(resource, data)
+    # @param resource [Symbol] name of resource
+    # @param body [Hash] to send to the service
+    def delete(resource, body)
+      sender.request(:delete, resource, {body: body})
     end
   end
 end
