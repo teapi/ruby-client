@@ -6,8 +6,14 @@ module HttpHelper
     Teapi.configuration
   end
 
-  def assert_body(args, expected)
-    expect(args[:body]).to eq(Oj.dump(expected, mode: :compat))
+  def assert_body(args, expected, gzipped = false)
+    body = args[:body]
+    if gzipped then
+      io = StringIO.new(body, "rb")
+      gz = Zlib::GzipReader.new(io)
+      body = gz.read
+    end
+    expect(body).to eq(Oj.dump(expected, mode: :compat))
   end
 
   def assert_auth(args, key, sig)

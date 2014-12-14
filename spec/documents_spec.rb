@@ -35,4 +35,15 @@ describe 'documents' do
     configuration = setup_configuration(sync_key: 'over9000!', sync_secret: 'dune', host: 'fake.teapi.io')
     expect(Teapi::Documents.delete('atreides', 545).code).to eq(204)
   end
+
+  it "gzips larger documents" do
+    expect(HTTParty).to receive(:post) do |url, args|
+      expect(url).to eq('https://fake.teapi.io/v1/documents?ts=1424959555')
+      assert_auth(args, 'over9000', '9a1b74cc93916d6e63d57b1219b38b31c8fee6672355e46cbdbb428c6aee230a')
+      assert_body(args, {type: 'people', doc: {name: 'a' * 1024}}, true)
+      FakeResponse.new('', 201)
+    end
+    configuration = setup_configuration(sync_key: 'over9000', sync_secret: 'spice', host: 'fake.teapi.io')
+    expect(Teapi::Documents.create('people', {name: 'a' * 1024}).code).to eq(201)
+  end
 end
