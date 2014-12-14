@@ -46,4 +46,15 @@ describe 'documents' do
     configuration = setup_configuration(sync_key: 'over9000', sync_secret: 'spice', host: 'fake.teapi.io')
     expect(Teapi::Documents.create('people', {name: 'a' * 1024}).code).to eq(201)
   end
+
+  it "handles bulk requests" do
+    expect(HTTParty).to receive(:post) do |url, args|
+      expect(url).to eq('https://fake.teapi.io/v1/documents?ts=1424959555')
+      assert_auth(args, 'over9000', '53995f97faf21ab5627e9429ed46aa1b05cbcf79445bc9f5131f60fb6ebe8726')
+      assert_body(args, {type: 'people', deletes: [{id: 344}], upserts: [{name: 'jessica'}, {name: 'leto'}]})
+      FakeResponse.new('', 201)
+    end
+    configuration = setup_configuration(sync_key: 'over9000', sync_secret: 'spice', host: 'fake.teapi.io')
+    expect(Teapi::Documents.bulk('people', [{name: 'jessica'}, {name: 'leto'}], [{id: 344}]).code).to eq(201)
+  end
 end
