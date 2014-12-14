@@ -6,6 +6,7 @@ Gem::Specification.new do |s|
   s.summary            = 'A ruby client for teapi.io'
   s.require_path       = 'lib'
   s.authors            = ['Karl Seguin']
+  s.licenses           = ['MIT']
   s.email              = ['support@teapi.io']
   s.version            = Teapi::VERSION
   s.platform           = Gem::Platform::RUBY
