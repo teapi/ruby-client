@@ -57,4 +57,27 @@ describe 'documents' do
     configuration = setup_configuration(sync_key: 'over9000', sync_secret: 'spice', host: 'fake.teapi.io')
     expect(Teapi::Documents.bulk('people', [{name: 'jessica'}, {name: 'leto'}], [{id: 344}]).code).to eq(201)
   end
+
+  it "handles invalid timestamp response" do
+    expect(HTTParty).to receive(:post) do |url, args|
+      FakeResponse.new('{"error": "invalid timestamp", "ts": 12323323}', 401)
+    end
+    expect(HTTParty).to receive(:post) do |url, args|
+      expect(url).to eq('https://fake.teapi.io/v1/documents?ts=12323323')
+      FakeResponse.new('', 200)
+    end
+    configuration = setup_configuration(sync_key: 'over9000', sync_secret: 'spice', host: 'fake.teapi.io')
+    expect(Teapi::Documents.bulk('people', [{name: 'jessica'}, {name: 'leto'}], [{id: 344}]).code).to eq(200)
+  end
+
+  it "doesn't endlessly try to solve timestamp issues" do
+    expect(HTTParty).to receive(:post) do |url, args|
+      FakeResponse.new('{"error": "invalid timestamp", "ts": 12323323}', 401)
+    end
+    expect(HTTParty).to receive(:post) do |url, args|
+      FakeResponse.new('{"error": "invalid timestamp", "ts": 213232}', 401)
+    end
+    configuration = setup_configuration(sync_key: 'over9000', sync_secret: 'spice', host: 'fake.teapi.io')
+    expect(Teapi::Documents.bulk('people', [{name: 'jessica'}, {name: 'leto'}], [{id: 344}]).code).to eq(401)
+  end
 end

@@ -22,10 +22,11 @@ module HttpHelper
 end
 
 class FakeResponse < Net::HTTPSuccess
-  attr_accessor :code, :body
+  attr_accessor :code, :body, :parsed_response
 
   def initialize(body, code = 200)
     @body = body
+    @parsed_response = Oj.load(body)
     @code = code
   end
 end

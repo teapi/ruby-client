@@ -14,8 +14,8 @@ module Teapi
       @configuration = configuration
     end
 
-    def request(method, resource, args = {})
-      url = "#{BASE_URL}#{resource}?ts=#{Time.now.to_i}"
+    def request(method, resource, args = {}, ts = nil)
+      url = "#{BASE_URL}#{resource}?ts=#{ts || Time.now.to_i}"
       args[:headers] = (args[:headers] || {}).merge({
         'Authorization' => sign(url, args),
       })
@@ -24,7 +24,11 @@ module Teapi
         args[:headers]['Content-Encoding'] = 'gzip'
       end
       scheme = @configuration.secure ? "https" : "http"
-      HTTParty.send(method, "#{scheme}://#{@configuration.host}#{url}", args)
+      res = HTTParty.send(method, "#{scheme}://#{@configuration.host}#{url}", args)
+      if res.code == 401 && res.parsed_response.include?('ts') && ts.nil?
+        return request(method, resource, args, res.parsed_response['ts'])
+      end
+      res
     end
 
     def sign(url, args)
