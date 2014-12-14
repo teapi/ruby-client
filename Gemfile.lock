@@ -25,6 +25,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  httparty (~> 0.13.3)
-  oj (~> 2.11.1)
+  httparty (= 0.13.3)
+  oj (= 2.11.1)
   rspec
