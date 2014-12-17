@@ -4,9 +4,11 @@ describe 'documents' do
   include HttpHelper
 
   it "inserts a single document" do
+    allow(Time).to receive(:now) { Time.at(1424959556) }
     expect(HTTParty).to receive(:post) do |url, args|
-      expect(url).to eq('https://fake.teapi.io/v1/documents?ts=1424959555')
-      assert_auth(args, 'over9000', '29fa1c33729ef7c64e4e430a5c90c772f8a52c1545c099b773a1e6a589713f64')
+      expect(url).to eq('https://fake.teapi.io/v1/documents')
+      assert_auth(args, 'over9000', 'bc7468116834daef4bd3e7d1c6498cd6da15a4112859b04131bee870407c7120')
+      assert_date(args, 'Thu, 26 Feb 2015 14:05:56 GMT')
       assert_body(args, {type: 'people', doc: {name: 'leto'}})
       FakeResponse.new('', 201)
     end
@@ -15,9 +17,11 @@ describe 'documents' do
   end
 
   it "updates a single document" do
+    allow(Time).to receive(:now) { Time.at(1424959555) }
     expect(HTTParty).to receive(:put) do |url, args|
-      expect(url).to eq('https://fake.teapi.io/v1/documents?ts=1424959555')
-      assert_auth(args, 'over9000!', '1bdd9cba08569235035b210df5131b1eb55993fe15fb2b5a2ff94dc39801d332')
+      expect(url).to eq('https://fake.teapi.io/v1/documents')
+      assert_auth(args, 'over9000!', '26414ed86ad279509edf3971d898eca716bcb0c833fe3b0ac1a62b037fb92b70')
+      assert_date(args, 'Thu, 26 Feb 2015 14:05:55 GMT')
       assert_body(args, {type: 'atreides', doc: {name: 'jessica'}})
       FakeResponse.new('', 201)
     end
@@ -26,9 +30,11 @@ describe 'documents' do
   end
 
   it "deletes a single document" do
+    allow(Time).to receive(:now) { Time.at(1424959555) }
     expect(HTTParty).to receive(:delete) do |url, args|
-      expect(url).to eq('https://fake.teapi.io/v1/documents?ts=1424959555')
-      assert_auth(args, 'over9000!', 'f5cf7c3c2fe6084a24151a5d3973d0f1837530098603f826da9aaa578985ec75')
+      expect(url).to eq('https://fake.teapi.io/v1/documents')
+      assert_auth(args, 'over9000!', '8f32750c4064022a9c0fdd57ac3d1f0e78bdf53fe59095a4a9e69ae29eeed75d')
+      assert_date(args, 'Thu, 26 Feb 2015 14:05:55 GMT')
       assert_body(args, {type: 'atreides', id: 545})
       FakeResponse.new('', 204)
     end
@@ -37,9 +43,11 @@ describe 'documents' do
   end
 
   it "gzips larger documents" do
+    allow(Time).to receive(:now) { Time.at(1424959555) }
     expect(HTTParty).to receive(:post) do |url, args|
-      expect(url).to eq('https://fake.teapi.io/v1/documents?ts=1424959555')
-      assert_auth(args, 'over9000', '9a1b74cc93916d6e63d57b1219b38b31c8fee6672355e46cbdbb428c6aee230a')
+      expect(url).to eq('https://fake.teapi.io/v1/documents')
+      assert_auth(args, 'over9000', '5130fb2dca1c48bc231e5ef18117c65cb98dffcd411e9844f9a7df30482ffbb2')
+      assert_date(args, 'Thu, 26 Feb 2015 14:05:55 GMT')
       assert_body(args, {type: 'people', doc: {name: 'a' * 1024}}, true)
       FakeResponse.new('', 201)
     end
@@ -48,9 +56,11 @@ describe 'documents' do
   end
 
   it "handles bulk requests" do
+    allow(Time).to receive(:now) { Time.at(1424959555) }
     expect(HTTParty).to receive(:post) do |url, args|
-      expect(url).to eq('https://fake.teapi.io/v1/documents?ts=1424959555')
-      assert_auth(args, 'over9000', '53995f97faf21ab5627e9429ed46aa1b05cbcf79445bc9f5131f60fb6ebe8726')
+      expect(url).to eq('https://fake.teapi.io/v1/documents')
+      assert_auth(args, 'over9000', '145a73bf6ccd6a2bc490ac60ea4f52f0ea4a5b350836a593ec7b1d198a5292c3')
+      assert_date(args, 'Thu, 26 Feb 2015 14:05:55 GMT')
       assert_body(args, {type: 'people', deletes: [{id: 344}], upserts: [{name: 'jessica'}, {name: 'leto'}]})
       FakeResponse.new('', 201)
     end
@@ -60,10 +70,11 @@ describe 'documents' do
 
   it "handles invalid timestamp response" do
     expect(HTTParty).to receive(:post) do |url, args|
-      FakeResponse.new('{"error": "invalid timestamp", "ts": 12323323}', 401)
+      FakeResponse.new('{"error": "invalid timestamp", "date": "Thu, 26 Feb 2015 14:05:10 GMT"}', 401)
     end
     expect(HTTParty).to receive(:post) do |url, args|
-      expect(url).to eq('https://fake.teapi.io/v1/documents?ts=12323323')
+      expect(url).to eq('https://fake.teapi.io/v1/documents')
+      assert_date(args, 'Thu, 26 Feb 2015 14:05:10 GMT')
       FakeResponse.new('', 200)
     end
     configuration = setup_configuration(sync_key: 'over9000', sync_secret: 'spice', host: 'fake.teapi.io')
@@ -72,10 +83,10 @@ describe 'documents' do
 
   it "doesn't endlessly try to solve timestamp issues" do
     expect(HTTParty).to receive(:post) do |url, args|
-      FakeResponse.new('{"error": "invalid timestamp", "ts": 12323323}', 401)
+      FakeResponse.new('{"error": "invalid timestamp", "date": "Thu, 26 Feb 2015 14:05:10 GMT"}', 401)
     end
     expect(HTTParty).to receive(:post) do |url, args|
-      FakeResponse.new('{"error": "invalid timestamp", "ts": 213232}', 401)
+      FakeResponse.new('{"error": "invalid timestamp", "date": "Thu, 26 Feb 2015 14:05:11 GMT"}', 401)
     end
     configuration = setup_configuration(sync_key: 'over9000', sync_secret: 'spice', host: 'fake.teapi.io')
     expect(Teapi::Documents.bulk('people', [{name: 'jessica'}, {name: 'leto'}], [{id: 344}]).code).to eq(401)

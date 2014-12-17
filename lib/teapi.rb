@@ -28,6 +28,7 @@ module Teapi #:nodoc
     # @param resource [Symbol] name of resource
     # @param body [Hash] to send to the service
     def post(resource, body)
+      assert_configured()
       sender.request(:post, resource, {body: body})
     end
 
@@ -35,6 +36,7 @@ module Teapi #:nodoc
     # @param resource [Symbol] name of resource
     # @param body [Hash] to send to the service
     def put(resource, body)
+      assert_configured()
       sender.request(:put, resource, {body: body})
     end
 
@@ -42,7 +44,16 @@ module Teapi #:nodoc
     # @param resource [Symbol] name of resource
     # @param body [Hash] to send to the service
     def delete(resource, body)
+      assert_configured()
       sender.request(:delete, resource, {body: body})
+    end
+
+    private
+    def assert_configured()
+      raise 'teapi invalid configuration' if @configuration.nil?
+      raise 'teapi invalid sync_key' if @configuration.sync_key.nil?
+      raise 'teapi invalid sync_secret' if @configuration.sync_secret.nil?
+      raise 'teapi invalid host' if @configuration.host.nil?
     end
   end
 end

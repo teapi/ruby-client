@@ -1,6 +1,7 @@
 require 'oj'
 require 'uri'
 require 'zlib'
+require 'time'
 require 'openssl'
 require 'httparty'
 require 'stringio'
@@ -14,10 +15,12 @@ module Teapi
       @configuration = configuration
     end
 
-    def request(method, resource, args = {}, ts = nil)
-      url = "#{BASE_URL}#{resource}?ts=#{ts || Time.now.to_i}"
+    def request(method, resource, args = {}, date = nil)
+      url = BASE_URL + resource.to_s
+      d = date || Time.now.httpdate
       args[:headers] = (args[:headers] || {}).merge({
-        'Authorization' => sign(url, args),
+        'Date' => d,
+        'Authorization' => sign(url, d, args),
       })
       if args[:body] != nil && args[:body].length > 1024 then
         args[:body] = gzip(args[:body])
@@ -25,14 +28,14 @@ module Teapi
       end
       scheme = @configuration.secure ? "https" : "http"
       res = HTTParty.send(method, "#{scheme}://#{@configuration.host}#{url}", args)
-      if res.code == 401 && res.parsed_response.include?('ts') && ts.nil?
-        return request(method, resource, args, res.parsed_response['ts'])
+      if res.code == 401 && res.parsed_response.include?('date') && date.nil?
+        return request(method, resource, args, res.parsed_response['date'])
       end
       res
     end
 
-    def sign(url, args)
-      data = url
+    def sign(url, date, args)
+      data = url + date
       data += args[:body] if args.include?(:body)
       signature = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), @configuration.sync_secret, data)
       "HMAC-SHA256 Credential=#{@configuration.sync_key},Signature=#{signature}"

@@ -19,14 +19,18 @@ module HttpHelper
   def assert_auth(args, key, sig)
     expect(args[:headers]['Authorization']).to eq("HMAC-SHA256 Credential=#{key},Signature=#{sig}")
   end
+
+  def assert_date(args, date)
+    expect(args[:headers]['Date']).to eq(date)
+  end
 end
 
-class FakeResponse < Net::HTTPSuccess
+class FakeResponse
   attr_accessor :code, :body, :parsed_response
 
   def initialize(body, code = 200)
+    @code = code
     @body = body
     @parsed_response = Oj.load(body)
-    @code = code
   end
 end
