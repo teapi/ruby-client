@@ -4,15 +4,21 @@ module Teapi
     # creates a new document belonging to the given type
     # @param type [String] the document's type
     # @param doc [Hash] document to create
-    def self.create(type, doc)
-      Teapi.post(:documents, Oj.dump({type: type, doc: doc}, mode: :compat))
+    # @param optional meta [Hash] meta data associated with the document
+    def self.create(type, doc, meta = nil)
+      d = {type: type, doc: doc}
+      d[:meta] = meta unless meta.nil?
+      Teapi.post(:documents, Oj.dump(d, mode: :compat))
     end
 
     # updates the document belonging to the given type
     # @param type [String] the document's type
     # @param doc [Hash] the document to update
-    def self.update(type, doc)
-      Teapi.put(:documents, Oj.dump({type: type, doc: doc}, mode: :compat))
+    # @param optional meta [Hash] meta data associated with the document
+    def self.update(type, doc, meta = nil)
+      d = {type: type, doc: doc}
+      d[:meta] = meta unless meta.nil?
+      Teapi.put(:documents, Oj.dump(d, mode: :compat))
     end
 
     # deletes the document, by its id, belonging to the given type

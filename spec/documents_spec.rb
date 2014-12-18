@@ -16,6 +16,19 @@ describe 'documents' do
     expect(Teapi::Documents.create('people', {name: 'leto'}).code).to eq(201)
   end
 
+  it "inserts a single document with meta" do
+    allow(Time).to receive(:now) { Time.at(1424959556) }
+    expect(HTTParty).to receive(:post) do |url, args|
+      expect(url).to eq('https://fake.teapi.io/v1/documents')
+      assert_auth(args, 'over9000', '3528af433da22cd3afff77c4f9ebb7b9a79bc8be2686223dc86442eabafc70bc')
+      assert_date(args, 'Thu, 26 Feb 2015 14:05:56 GMT')
+      assert_body(args, {type: 'people', doc: {name: 'leto'}, meta: {name: 'l a'}})
+      FakeResponse.new('', 201)
+    end
+    configuration = setup_configuration(sync_key: 'over9000', sync_secret: 'spice', host: 'fake.teapi.io')
+    expect(Teapi::Documents.create('people', {name: 'leto'}, {name: 'l a'}).code).to eq(201)
+  end
+
   it "updates a single document" do
     allow(Time).to receive(:now) { Time.at(1424959555) }
     expect(HTTParty).to receive(:put) do |url, args|
@@ -27,6 +40,19 @@ describe 'documents' do
     end
     configuration = setup_configuration(sync_key: 'over9000!', sync_secret: 'dune', host: 'fake.teapi.io')
     expect(Teapi::Documents.update('atreides', {name: 'jessica'}).code).to eq(201)
+  end
+
+  it "updates a single document with meta" do
+    allow(Time).to receive(:now) { Time.at(1424959555) }
+    expect(HTTParty).to receive(:put) do |url, args|
+      expect(url).to eq('https://fake.teapi.io/v1/documents')
+      assert_auth(args, 'over9000!', 'da15517e131868af1082774b892b4fa6628a15b060238b0075dd093127103970')
+      assert_date(args, 'Thu, 26 Feb 2015 14:05:55 GMT')
+      assert_body(args, {type: 'atreides', doc: {name: 'jessica'}, meta: {name: 'j a'}})
+      FakeResponse.new('', 201)
+    end
+    configuration = setup_configuration(sync_key: 'over9000!', sync_secret: 'dune', host: 'fake.teapi.io')
+    expect(Teapi::Documents.update('atreides', {name: 'jessica'}, {name: 'j a'}).code).to eq(201)
   end
 
   it "deletes a single document" do
