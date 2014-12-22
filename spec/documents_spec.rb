@@ -68,19 +68,6 @@ describe 'documents' do
     expect(Teapi::Documents.delete('atreides', 545).code).to eq(204)
   end
 
-  it "gzips larger documents" do
-    allow(Time).to receive(:now) { Time.at(1424959555) }
-    expect(HTTParty).to receive(:post) do |url, args|
-      expect(url).to eq('https://fake.teapi.io/v1/documents')
-      assert_auth(args, 'over9000', '5130fb2dca1c48bc231e5ef18117c65cb98dffcd411e9844f9a7df30482ffbb2')
-      assert_date(args, 'Thu, 26 Feb 2015 14:05:55 GMT')
-      assert_body(args, {type: 'people', doc: {name: 'a' * 1024}}, true)
-      FakeResponse.new('', 201)
-    end
-    configuration = setup_configuration(sync_key: 'over9000', sync_secret: 'spice', host: 'fake.teapi.io')
-    expect(Teapi::Documents.create('people', {name: 'a' * 1024}).code).to eq(201)
-  end
-
   it "handles bulk requests" do
     allow(Time).to receive(:now) { Time.at(1424959555) }
     expect(HTTParty).to receive(:post) do |url, args|

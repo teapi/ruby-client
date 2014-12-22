@@ -26,7 +26,7 @@ module Teapi #:nodoc
 
     # Issues a POST request to the teapi.io service
     # @param resource [Symbol] name of resource
-    # @param body [Hash] to send to the service
+    # @param body [String] to send to the service
     def post(resource, body)
       assert_configured()
       sender.request(:post, resource, {body: body})
@@ -34,7 +34,7 @@ module Teapi #:nodoc
 
     # Issues a PUT request to the teapi.io service
     # @param resource [Symbol] name of resource
-    # @param body [Hash] to send to the service
+    # @param body [String] to send to the service
     def put(resource, body)
       assert_configured()
       sender.request(:put, resource, {body: body})
@@ -42,7 +42,7 @@ module Teapi #:nodoc
 
     # Issues a DELETE request to the teapi.io service
     # @param resource [Symbol] name of resource
-    # @param body [Hash] to send to the service
+    # @param body [String] to send to the service
     def delete(resource, body)
       assert_configured()
       sender.request(:delete, resource, {body: body})
