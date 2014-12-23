@@ -17,7 +17,7 @@ module Teapi
 
     def request(method, resource, args = {}, date = nil)
       url = BASE_URL + resource.to_s
-      d = date || Time.now.httpdate
+      d = date || Time.now.utc.httpdate
       args[:headers] = (args[:headers] || {}).merge({
         'Date' => d,
         'Authorization' => sign(url, d, args),
