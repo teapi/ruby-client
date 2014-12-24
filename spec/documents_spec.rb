@@ -16,6 +16,16 @@ describe 'documents' do
     expect(Teapi::Documents.create('people', {name: 'leto'}).code).to eq(201)
   end
 
+  it "serializes dates in an acceptable format" do
+    allow(Time).to receive(:now) { Time.at(1424959556) }
+    expect(HTTParty).to receive(:post) do |url, args|
+      assert_body(args, {type: 'people', doc: {created_at: '2015-02-26 21:05:56 +0700'}})
+      FakeResponse.new('', 201)
+    end
+    configuration = setup_configuration(sync_key: 'over9000', sync_secret: 'spice', host: 'fake.teapi.io')
+    expect(Teapi::Documents.create('people', {created_at: Time.now}).code).to eq(201)
+  end
+
   it "inserts a single document with meta" do
     allow(Time).to receive(:now) { Time.at(1424959556) }
     expect(HTTParty).to receive(:post) do |url, args|
