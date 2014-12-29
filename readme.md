@@ -11,7 +11,7 @@ gem install teapi
 On startup, you'll want to setup your host, key and secret:
 
 ```ruby
-Teapi .configure do |config|
+Teapi.configure do |config|
 	# retrieve these values from the 'settings'
 	# section of the management dashboard
 	config.host =  'HOST'
