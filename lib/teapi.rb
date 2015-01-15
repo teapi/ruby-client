@@ -1,6 +1,7 @@
 require 'teapi/version'
 require 'teapi/configuration'
 require 'teapi/documents'
+require 'teapi/lists'
 require 'teapi/sender'
 
 module Teapi #:nodoc
