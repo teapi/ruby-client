@@ -80,5 +80,26 @@ Teapi::Documents.bulk('people',
 )
 ```
 
+## Lists
+Document ids can be pushed onto and removed from lists:
+
+```ruby
+Teapi::Lists.insert('people', 'newest', [1, 4, 992])
+Teapi::Lists.delete('people', 'newest', 992)
+```
+
+For both `insert` and `delete`, the ids can either be a single value or an array (up to 1000 ids can be inserted / deleted at a time). You can also pass no ids to `delete`. This will remove all ids from the list:
+
+```ruby
+Teapi::Lists.delete('people', 'newest')
+```
+
+`insert` takes a 4th, optional, parameter: `truncate`. This defaults to `false`, but when set to true, it'll delete all existing ids then insert the newly provide one(s):
+
+```ruby
+// this will result in a list of only 1 id (99)
+Teapi::Lists.insert('people', 'newest', 99, true)
+```
+
 # Return and Exceptions
 The teapi library is a thin wrapper around the HTTP library. Errors such as connection failures will result in an exception being raised, whereas trying to delete a non-existing document will result in a response being returned with a status `response.code` of 404 (and a [hopefully useful] JSON-encoded `response.body`).

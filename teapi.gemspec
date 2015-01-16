@@ -3,7 +3,7 @@ require File.expand_path('../lib/teapi/version', __FILE__)
 Gem::Specification.new do |s|
   s.name               = 'teapi'
   s.description        = 'ruby client for teapi.io'
-  s.homepage           = 'http://www.teapi.io'
+  s.homepage           = 'https://teapi.io/'
   s.summary            = 'A ruby client for teapi.io'
   s.require_path       = 'lib'
   s.authors            = ['Karl Seguin']
